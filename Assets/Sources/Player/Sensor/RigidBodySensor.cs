@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Linq;
+using System;
 
 public class RigidBodySensor : Sensor
 {
@@ -7,10 +9,16 @@ public class RigidBodySensor : Sensor
     [SerializeField] private Vector2 _direction;
     [SerializeField] private float _distance;
 
-    public override RaycastHit2D Hit => TimeUpdate() ? CastUpdate()[0] : _lastHit[0];
+    public override RaycastHit2D Hit => TimeUpdate() ? CastUpdate() : _lastHit;
 
-    private RaycastHit2D[] _lastHit = new RaycastHit2D[1];
+    private RaycastHit2D _lastHit;
+    private ContactFilter2D _contactFilter;
     private float _lastUpdated = 0f;
+
+    private void Awake()
+    {
+        _contactFilter.SetLayerMask(_layerMask);
+    }
 
     private bool TimeUpdate()
     {
@@ -21,13 +29,20 @@ public class RigidBodySensor : Sensor
     }
 
     [ContextMenu("Update")]
-    private RaycastHit2D[] CastUpdate()
+    private RaycastHit2D CastUpdate()
     {
-        var castResults = new RaycastHit2D[1];
-        _rigidbody.Cast(_direction, castResults, _distance);
-        _lastHit = castResults;
-        return _lastHit;
+        var castResults = new RaycastHit2D[3];
+        var count = _rigidbody.Cast(_direction, _contactFilter, castResults, _distance);
+        if (count <= 1) 
+        {
+            _lastHit = castResults[0];
+            return _lastHit;
+        }
+        return castResults
+            .Where(cast => cast.collider)
+            .Aggregate((min, next) => MathF.Abs(min.normal.x) < MathF.Abs(next.normal.x) ? min : next);
     }
+
 
     private void OnValidate()
     {

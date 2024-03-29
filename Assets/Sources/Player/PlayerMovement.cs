@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -31,7 +32,7 @@ public class PlayerMovement : MonoBehaviour
         ApplyVelocity();
     }
 
-    #region FrameVelocity
+    #region Frame Velocity
 
     private void HandleVelocity()
     {
@@ -45,6 +46,7 @@ public class PlayerMovement : MonoBehaviour
     private bool _isGrounded;
     private bool _wasGrounded;
     private float _lastGroundTime;
+    private float _groundAngle;
 
     private void CheckCollisions()
     {
@@ -53,6 +55,7 @@ public class PlayerMovement : MonoBehaviour
         if (_isGrounded)
         {
             _lastGroundTime = Time.fixedTime;
+            _groundAngle = Vector2.Angle(_groundSensor.Hit.normal, Vector2.up);
             if (!_wasGrounded)
             {
                 _wasGrounded = true;
@@ -77,15 +80,20 @@ public class PlayerMovement : MonoBehaviour
         var move = _controls.Move;
         var direction = MathF.Sign(move);
         _facingRight = GetRotationByDirection(direction);
-        if (direction == 0)
+        if (_isGrounded)
         {
-            var deceleration = _isGrounded ? _config.Deceleration : _config.AirDeceleration;
-            _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, 0, deceleration * Time.fixedDeltaTime);
+            if (_groundAngle > _config.MaxSurfaceAngle) { return; }
+            var groundNormal = _groundSensor.Hit.normal;
+            var alongGround = new Vector2(groundNormal.y, -groundNormal.x);
+            _frameVelocity = (direction == 0)
+                ? Vector2.MoveTowards(_frameVelocity, Vector2.zero, _config.Deceleration)
+                : Vector2.MoveTowards(_frameVelocity, _config.Velocity * move * alongGround, _config.Acceleration * Time.fixedDeltaTime);
         }
         else
         {
-            var (acceleration, targetVelocity) = _isGrounded ? (_config.Acceleration, _config.Velocity) : (_config.AirAcceleration, _config.AirVelocity);
-            _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, move * targetVelocity, acceleration * Time.fixedDeltaTime);
+            _frameVelocity.x = (direction == 0)
+                ? Mathf.MoveTowards(_frameVelocity.x, 0, _config.AirDeceleration * Time.fixedDeltaTime)
+                : Mathf.MoveTowards(_frameVelocity.x, move * _config.AirVelocity, _config.AirAcceleration * Time.fixedDeltaTime);
         }
     }
 
@@ -101,7 +109,7 @@ public class PlayerMovement : MonoBehaviour
         var jump = _controls.Jump;
         var jumpWasReleased = _controls.PopJumpReleasedState();
         if (!_jumpEarlyEnded && !_isGrounded && jumpWasReleased && _frameVelocity.y > 0) { _jumpEarlyEnded = true; }
-        if ((_isGrounded || CanUseCoyote) && jump && jumpWasReleased) { ExecuteJump(); }
+        if ((_isGrounded || CanUseCoyote) && jump && jumpWasReleased && _groundAngle <= _config.MaxSurfaceAngle) { ExecuteJump(); }
     }
     private void ExecuteJump()
     {
@@ -109,18 +117,23 @@ public class PlayerMovement : MonoBehaviour
         _frameVelocity.y = _config.JumpVelocity;
         _coyoteLocked = true;
     }
-
+    
     #endregion
 
     #region HandleGravity
 
     private void HandleGravity()
     {
+        var gravity = _rigidbody.gravityScale * Physics2D.gravity;
         if (!_isGrounded)
         {
-            var gravity = _rigidbody.gravityScale * Physics2D.gravity.y;
             if (_jumpEarlyEnded && _frameVelocity.y > 0) { gravity *= _config.JumpEndEarlyGravityModifier; }
-            _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, _config.MaxFallVelocity, gravity * Time.deltaTime);
+            _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, _config.MaxFallVelocity, gravity.y * Time.deltaTime);
+            return;
+        }
+        if (_groundAngle <= _config.MaxSurfaceAngle)
+        {
+            _rigidbody.AddForce(gravity * -_rigidbody.mass);
         }
     }
 
