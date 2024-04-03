@@ -1,9 +1,13 @@
+using System;
+
 public class PlayerInput
 {
+    public event Action OnEnable;
+    public event Action OnDisable;
     public bool Enable { get => _enable; set => SetState(value); }
 
-    private readonly PlayerActions _playerActions;
-    private readonly IControllable _controllable;
+    protected readonly PlayerActions _playerActions;
+    protected readonly IControllable _controllable;
     private bool _enable = false;
 
     public PlayerInput(IControllable controllable)
@@ -11,6 +15,7 @@ public class PlayerInput
         _playerActions = new();
         _controllable = controllable;
         BindControls();
+        BindStateChange();
     }
 
     private void BindControls()
@@ -21,20 +26,19 @@ public class PlayerInput
         _playerActions.Game.Jump.canceled += (ctx) => _controllable.Jump = false;
     }
 
+    private void BindStateChange()
+    {
+        OnEnable += _playerActions.Game.Enable;
+        OnDisable += _playerActions.Game.Disable;
+        OnDisable+= StopMoving;
+    }
+
+    private void StopMoving() { _controllable.Move = 0f; _controllable.Jump = false; }
+
     private void SetState(bool enable)
     {
         if (enable == _enable) { return; }
         _enable = enable;
-        if (enable) { SetEnable(); } else { SetDisable(); }
-    }
-
-    private void SetEnable()
-    {
-        _playerActions.Game.Enable();
-    }
-
-    private void SetDisable()
-    {
-        _playerActions.Game.Disable();
+        if (enable) { OnEnable?.Invoke(); } else { OnDisable?.Invoke(); }
     }
 }

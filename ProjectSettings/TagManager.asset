@@ -44,3 +44,6 @@ TagManager:
   - name: Player
     uniqueID: 3294545379
     locked: 0
+  - name: Clone
+    uniqueID: 2203061749
+    locked: 0

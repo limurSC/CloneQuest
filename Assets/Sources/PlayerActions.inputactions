@@ -1,5 +1,5 @@
 {
-    "name": "PlayerInput",
+    "name": "PlayerActions",
     "maps": [
         {
             "name": "Game",
@@ -18,6 +18,33 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "c4919f55-f007-4e14-8173-002536ff29a3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Clone",
+                    "type": "Button",
+                    "id": "f9e2ce1e-e6ee-480c-9d80-8675a0fd5b8d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Restart",
+                    "type": "Button",
+                    "id": "53fcad31-c7f7-4d25-9320-f4120234a5b9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Esc",
+                    "type": "Button",
+                    "id": "befdf083-34ec-4c6f-a9cb-f182b78d27bf",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -121,6 +148,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5d5f2bc5-d96c-4db2-8e99-a4b6b4f07a80",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Clone",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e81defa6-bf41-4f51-a84b-7f2c07eb0596",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Restart",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "79328f10-eaa3-4463-b9d3-a11b7834a586",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Esc",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

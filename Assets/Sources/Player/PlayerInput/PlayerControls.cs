@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class PlayerControls : MonoBehaviour, IControllable
 {
-    public float Move { get; set; }
+    public float Move { get => enable ? _move : 0f; set => _move = value; }
     public bool Jump
     {
-        get => _jump;
+        get => enable && _jump;
         set
         {
             if (!value) { _jumpWasReleased = true; }
@@ -14,12 +14,17 @@ public class PlayerControls : MonoBehaviour, IControllable
     }
     public bool PopJumpReleasedState()
     {
-        if (!_jump) { return true; }
+        if (!_jump || !enable) { return true; }
         if (!_jumpWasReleased) { return false; }
         _jumpWasReleased = false;
         return true;
     }
 
+    private bool enable = false;
+    private float _move = 0f;
     private bool _jump = false;
     private bool _jumpWasReleased = true;
+
+    private void OnEnable() { enable = true; }
+    private void OnDisable() { enable = false; }
 }
