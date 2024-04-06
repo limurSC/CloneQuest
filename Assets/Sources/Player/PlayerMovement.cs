@@ -1,5 +1,4 @@
 using System;
-using System.Linq.Expressions;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -11,7 +10,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private PlayerConfig _config;
     [SerializeField] private Transform _flipAnchor;
     [SerializeField] private Rigidbody2D _rigidbody;
-    [SerializeField] private Sensor _headSensor;
     [SerializeField] private Sensor _groundSensor;
 
     private Vector2 _frameVelocity;
@@ -117,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
         _frameVelocity.y = _config.JumpVelocity;
         _coyoteLocked = true;
     }
-    
+
     #endregion
 
     #region HandleGravity
@@ -172,10 +170,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!_rigidbody) { _rigidbody = GetComponent<Rigidbody2D>(); }
         if (!_controls) { _controls = GetComponent<PlayerControls>(); }
-        if (!_groundSensor || !_headSensor)
-        {
-            Debug.LogWarning("One or more sensors not attached");
-        }
+        if (!_groundSensor) { Debug.LogWarning("Sensor not attached"); }
+        if (!_config) { Debug.Log("Config not attached"); }
     }
 
     #endregion

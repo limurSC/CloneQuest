@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Linq;
-using System;
+using System.Collections.Generic;
 
 public class RigidBodySensor : Sensor
 {
@@ -31,16 +31,12 @@ public class RigidBodySensor : Sensor
     [ContextMenu("Update")]
     private RaycastHit2D CastUpdate()
     {
-        var castResults = new RaycastHit2D[3];
+        var castResults = new List<RaycastHit2D>();
         var count = _rigidbody.Cast(_direction, _contactFilter, castResults, _distance);
-        if (count <= 1) 
-        {
-            _lastHit = castResults[0];
-            return _lastHit;
-        }
-        return castResults
-            .Where(cast => cast.collider)
-            .Aggregate((min, next) => MathF.Abs(min.normal.x) < MathF.Abs(next.normal.x) ? min : next);
+        _lastHit = castResults
+            .OrderBy(cast => Vector2.Angle(cast.normal, Vector2.up))
+            .FirstOrDefault();
+        return _lastHit;
     }
 
 

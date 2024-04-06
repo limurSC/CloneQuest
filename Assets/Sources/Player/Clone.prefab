@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1175561053578682475, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 1231721208849214101, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -68,6 +72,10 @@ PrefabInstance:
       propertyPath: m_SortingLayerID
       value: -2091905547
       objectReference: {fileID: 0}
+    - target: {fileID: 4017088373286529444, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5123734475017819617, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -92,6 +100,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Clone
       objectReference: {fileID: 0}
+    - target: {fileID: 6307875421697334982, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 6902474508039072446, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
       propertyPath: m_Parameters.colorGradient.key0.b
       value: 0.2
@@ -115,6 +127,14 @@ PrefabInstance:
     - target: {fileID: 6902474508039072446, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
       propertyPath: m_Parameters.colorGradient.key1.r
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7667547649798557040, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8052138342592849607, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 9198170145976681636, guid: 61142b7f76441f84e8a4042b849fe456, type: 3}
       propertyPath: m_Color.b
