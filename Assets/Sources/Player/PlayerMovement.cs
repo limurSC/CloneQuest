@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Sensor _groundSensor;
 
     private Vector2 _frameVelocity;
+    private Vector2 _platformVelocity;
 
     void Awake()
     {
@@ -21,23 +22,14 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        HandleVelocity();
         CheckCollisions();
+        HandleVelocity();
         HandleMove();
         HandleJump();
         UpdateRotation();
         HandleGravity();
         ApplyVelocity();
     }
-
-    #region Frame Velocity
-
-    private void HandleVelocity()
-    {
-        _frameVelocity = _rigidbody.velocity;
-    }
-
-    #endregion
 
     # region Collisions
 
@@ -71,6 +63,17 @@ public class PlayerMovement : MonoBehaviour
 
     #endregion
 
+    #region Frame Velocity
+
+    private void HandleVelocity()
+    {
+        _frameVelocity = _rigidbody.velocity;
+        var platform = _groundSensor.Hit.rigidbody;
+        _platformVelocity = platform ? platform.velocity : Vector2.zero;
+    }
+
+    #endregion
+
     #region Move
 
     private void HandleMove()
@@ -83,9 +86,11 @@ public class PlayerMovement : MonoBehaviour
             if (_groundAngle > _config.MaxSurfaceAngle) { return; }
             var groundNormal = _groundSensor.Hit.normal;
             var alongGround = new Vector2(groundNormal.y, -groundNormal.x);
-            _frameVelocity = (direction == 0)
-                ? Vector2.MoveTowards(_frameVelocity, Vector2.zero, _config.Deceleration)
-                : Vector2.MoveTowards(_frameVelocity, _config.Velocity * move * alongGround, _config.Acceleration * Time.fixedDeltaTime);
+            var relativeVelocity = _frameVelocity - _platformVelocity;
+            _frameVelocity = ((direction == 0)
+                ? Vector2.MoveTowards(relativeVelocity, Vector2.zero, _config.Deceleration)
+                : Vector2.MoveTowards(relativeVelocity, _config.Velocity * move * alongGround, _config.Acceleration * Time.fixedDeltaTime))
+                + _platformVelocity;
         }
         else
         {
@@ -138,7 +143,7 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region Rotation
-
+    // TODO Should move to visual component
     [SerializeField] private bool _facingRight;
     private bool _previousFacingRight;
     private bool GetRotationByDirection(float direction) => direction == 0 ? _facingRight : direction > 0;
@@ -164,7 +169,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyVelocity() => _rigidbody.velocity = _frameVelocity;
 
-    #region Editor
+#if UNITY_EDITOR
 
     private void OnValidate()
     {
@@ -174,5 +179,5 @@ public class PlayerMovement : MonoBehaviour
         if (!_config) { Debug.Log("Config not attached"); }
     }
 
-    #endregion
+#endif
 }

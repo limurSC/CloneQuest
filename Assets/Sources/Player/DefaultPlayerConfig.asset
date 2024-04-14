@@ -17,7 +17,7 @@ MonoBehaviour:
   _deceleration: 70
   _airVelocity: 10
   _airAcceleration: 80
-  _airDeceleration: 30
+  _airDeceleration: 0
   _jumpVelocity: 20
   _coyoteTime: 0.1
   _maxFallVelocity: 30

@@ -40,6 +40,7 @@ public class RigidBodySensor : Sensor
     }
 
 
+#if UNITY_EDITOR
     private void OnValidate()
     {
         _direction.Normalize();
@@ -52,4 +53,5 @@ public class RigidBodySensor : Sensor
         Gizmos.color = Hit.collider ? Color.yellow : Color.grey;
         Gizmos.DrawRay(_rigidbody.position, _direction * _distance);
     }
+#endif
 }
