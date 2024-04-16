@@ -6,6 +6,7 @@ using UnityEngine;
 public class LinearMoving : MonoBehaviour
 {
     public Vector2 Pivot => _pivot;
+    public Vector2 RelativePosition => _rigidbody.position - _pivot;
     public bool Moving => _coroutine != null;
     public event Action TargetReached;
     [SerializeField] private Rigidbody2D _rigidbody;
@@ -44,10 +45,7 @@ public class LinearMoving : MonoBehaviour
         _coroutine = null;
     }
 
-    private void Awake()
-    {
-        _pivot = _rigidbody.position;
-    }
+    private void Awake() { _pivot = _rigidbody.position; }
 
 #if UNITY_EDITOR
     private void OnValidate()

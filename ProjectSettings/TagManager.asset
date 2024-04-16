@@ -41,6 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Objects
+    uniqueID: 1772552501
+    locked: 0
   - name: Clone
     uniqueID: 2203061749
     locked: 0

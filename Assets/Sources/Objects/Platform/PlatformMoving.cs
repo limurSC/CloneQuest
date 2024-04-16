@@ -1,56 +1,45 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PlatformMoving : WaypointMoving, IActivatable
+[RequireComponent(typeof(WaypointMoving))]
+[RequireComponent(typeof(WaypointLineRenderer))]
+public class PlatformMoving : MonoBehaviour, IActivatable, ISoftReset
 {
-    public bool Active { get => _active; set => SetActive(value); }
+    public bool Active { get => _active; set => ActiveSet(value); }
     public UnityEvent<bool> OnActivateSet;
-    public UnityEvent<bool> OnEdgeReached;
+    [SerializeField][Range(0.1f, 10f)] float _velocity = 1f;
+    [SerializeField] private WaypointMoving _waypointMoving;
+    [SerializeField] private WaypointLineRenderer _waypointLineRenderer;
     private bool _active;
-    private bool _moving;
 
-    public void SetActive(bool active)
+    private void ActiveSet(bool active)
     {
-        if (active == _active) return;
-        if (_moving) { Stop(); }
+        if (active == _active) { return; }
         _active = active;
-        _moving = true;
-        if (_active) { Activate(); } else { Deactivate(); }
-        OnActivateSet.Invoke(active);
+        if (active) { _waypointMoving.MoveForward(_velocity); }
+        else { _waypointMoving.MoveBackward(_velocity); }
+        OnActivateSet?.Invoke(active);
     }
 
-    private void Activate()
+    public void SoftReset(float duration)
     {
-        MoveForward();
-        WaypointReached.AddListener(MoveForward);
-        TargetReached.AddListener(EdgeReached);
-    }
-    private void Deactivate()
-    {
-        MoveBackward();
-        WaypointReached.AddListener(MoveBackward);
-        TargetReached.AddListener(EdgeReached);
+        _active = false;
+        _waypointMoving.MoveBackwardByTime(duration);
+        OnActivateSet?.Invoke(_active);
     }
 
-    private void Stop()
+    private void Start()
     {
-        _moving = false;
-        RemoveListeners();
+        _waypointLineRenderer.SetPoints(_waypointMoving.Pivot, _waypointMoving.Points);
+        EventBus.Subscribe<ISoftReset>(this);
     }
-    private void EdgeReached()
-    {
-        Stop();
-        OnEdgeReached.Invoke(_active);
-    }
-    private void RemoveListeners()
-    {
-        if (_active) { WaypointReached.RemoveListener(MoveForward); }
-        else { WaypointReached.RemoveListener(MoveBackward); }
-        TargetReached.RemoveListener(EdgeReached);
-    }
+    private void OnDestroy() { EventBus.Unsubscribe<ISoftReset>(this); }
 
-# if UNITY_EDITOR
-    [ContextMenu("Activate")] private void __Activate() => SetActive(true);
-    [ContextMenu("Deactivate")] private void __Deactivate() => SetActive(false);
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (_waypointMoving == null) { _waypointMoving = GetComponent<WaypointMoving>(); }
+        if (_waypointLineRenderer == null) { _waypointLineRenderer = GetComponent<WaypointLineRenderer>(); }
+    }
 #endif
 }
