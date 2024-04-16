@@ -169,6 +169,7 @@ GameObject:
   - component: {fileID: 141203972}
   - component: {fileID: 141203974}
   - component: {fileID: 141203973}
+  - component: {fileID: 141203975}
   m_Layer: 7
   m_Name: Block (2)
   m_TagString: Untagged
@@ -185,7 +186,7 @@ Transform:
   m_GameObject: {fileID: 141203970}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.5, y: -5.5, z: 0}
+  m_LocalPosition: {x: -3.5, y: -3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -315,6 +316,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &141203975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141203970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1888652eef1475e428a627f09ee327e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rigidbody: {fileID: 141203974}
 --- !u!1 &284369548
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,6 +341,7 @@ GameObject:
   - component: {fileID: 284369550}
   - component: {fileID: 284369552}
   - component: {fileID: 284369551}
+  - component: {fileID: 284369553}
   m_Layer: 7
   m_Name: Block (1)
   m_TagString: Untagged
@@ -343,7 +358,7 @@ Transform:
   m_GameObject: {fileID: 284369548}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -19, y: -8.5, z: 0}
+  m_LocalPosition: {x: -19, y: -6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -473,6 +488,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &284369553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 284369548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1888652eef1475e428a627f09ee327e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rigidbody: {fileID: 284369552}
 --- !u!4 &627596823 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8116761134617312014, guid: aea4db34cb8df2c44b97bb407bb82b0d, type: 3}
@@ -620,6 +648,7 @@ GameObject:
   - component: {fileID: 920522206}
   - component: {fileID: 920522208}
   - component: {fileID: 920522207}
+  - component: {fileID: 920522209}
   m_Layer: 7
   m_Name: Block (0)
   m_TagString: Untagged
@@ -636,7 +665,7 @@ Transform:
   m_GameObject: {fileID: 920522204}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -20.5, y: -8.5, z: 0}
+  m_LocalPosition: {x: -20.5, y: -6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -766,6 +795,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &920522209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920522204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1888652eef1475e428a627f09ee327e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rigidbody: {fileID: 920522208}
 --- !u!1 &1388557666
 GameObject:
   m_ObjectHideFlags: 0

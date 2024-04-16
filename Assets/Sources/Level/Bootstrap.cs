@@ -25,7 +25,7 @@ public class Bootstrap : MonoBehaviour
 
         var input = new PlayerActions();
         input.Game.Clone.started += (ctx) => Coroutines.Run(SpawnClone());
-        input.Game.Restart.started += (ctx) => Restart();
+        input.Game.Restart.started += (ctx) => { Restart(); EventBus.Invoke<ISoftReset>((obj) => obj.SoftReset(0.5f)); };
         input.Game.Esc.started += (ctx) => TogglePause();
         input.Game.Enable();
 
@@ -61,6 +61,4 @@ public class Bootstrap : MonoBehaviour
         Time.timeScale = _pause ? 1f : 0f;
         _pause = !_pause;
     }
-
-
 }
