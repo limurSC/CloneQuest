@@ -328,6 +328,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1888652eef1475e428a627f09ee327e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StartActions:
+    m_PersistentCalls:
+      m_Calls: []
+  EndActions:
+    m_PersistentCalls:
+      m_Calls: []
   _rigidbody: {fileID: 141203974}
 --- !u!1 &284369548
 GameObject:
@@ -500,6 +506,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1888652eef1475e428a627f09ee327e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StartActions:
+    m_PersistentCalls:
+      m_Calls: []
+  EndActions:
+    m_PersistentCalls:
+      m_Calls: []
   _rigidbody: {fileID: 284369552}
 --- !u!4 &627596823 stripped
 Transform:
@@ -807,6 +819,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1888652eef1475e428a627f09ee327e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StartActions:
+    m_PersistentCalls:
+      m_Calls: []
+  EndActions:
+    m_PersistentCalls:
+      m_Calls: []
   _rigidbody: {fileID: 920522208}
 --- !u!1 &1388557666
 GameObject:
@@ -856,7 +874,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f6c472a2d9abf42b76939b001c7c85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerPrefab: {fileID: 0}
   _clonePrefab: {fileID: 8934834484401430384, guid: 7695b877eb1accb46a6d27879f89a2ab, type: 3}
 --- !u!4 &1427952429 stripped
 Transform:

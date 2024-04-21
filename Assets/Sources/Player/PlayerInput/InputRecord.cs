@@ -41,6 +41,7 @@ public class InputRecord : IEnumerable<InputRecord.Item>
     }
 
     public void Trim() => _records.TrimExcess();
+    public void Clear() { _records.Clear(); _floatValues.Clear(); }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

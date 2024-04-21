@@ -16,10 +16,10 @@ public class InputReplay
     public bool IsRunning => _coroutine != null;
     public void Start()
     {
-        if (IsRunning) { Stop(); }
+        if (IsRunning) { Reset(); }
         _coroutine = Coroutines.Run(InputRoutine());
     }
-    public void Stop()
+    public void Reset()
     {
         if (!IsRunning) { return; }
         Coroutines.Stop(_coroutine);
@@ -33,6 +33,7 @@ public class InputReplay
             yield return new WaitForSeconds(item.wait);
             Execute(item);
         }
+        Execute(new(InputRecord.Type.None, 0f));
         _coroutine = null;
     }
 
@@ -58,6 +59,4 @@ public class InputReplay
                 break;
         }
     }
-
-    ~InputReplay() => Stop();
 }

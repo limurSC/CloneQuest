@@ -169,15 +169,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyVelocity() => _rigidbody.velocity = _frameVelocity;
 
-#if UNITY_EDITOR
+    private void OnDisable() { _rigidbody.velocity = Vector2.zero; }
 
+#if UNITY_EDITOR
     private void OnValidate()
     {
         if (!_rigidbody) { _rigidbody = GetComponent<Rigidbody2D>(); }
         if (!_controls) { _controls = GetComponent<PlayerControls>(); }
         if (!_groundSensor) { Debug.LogWarning("Sensor not attached"); }
-        if (!_config) { Debug.Log("Config not attached"); }
+        if (!_config) { Debug.LogWarning("Config not attached"); }
     }
-
 #endif
 }

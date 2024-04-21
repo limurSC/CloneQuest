@@ -1,13 +1,15 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class RigidbodySoftReset : MonoBehaviour, ISoftReset
+public class RigidbodySoftReset : MonoSoftResetListener
 {
+    public (Vector2 position, float rotation) Initial { get => (_initialPosition, _initialRotation); set => (_initialPosition, _initialRotation) = value; }
+
     [SerializeField] private Rigidbody2D _rigidbody;
     private Vector2 _initialPosition;
     private float _initialRotation;
 
-    public void SoftReset(float duration)
+    public void SoftResetHandler(float duration)
     {
         _rigidbody.bodyType = RigidbodyType2D.Static;
         DOTween.Sequence().SetLink(gameObject).SetEase(Ease.InOutCubic)
@@ -16,20 +18,17 @@ public class RigidbodySoftReset : MonoBehaviour, ISoftReset
             .AppendCallback(() => _rigidbody.bodyType = RigidbodyType2D.Dynamic);
     }
 
-    private void Awake()
+    private new void Awake()
     {
-        _initialPosition = _rigidbody.position;
-        _initialRotation = _rigidbody.rotation;
-        EventBus.Subscribe<ISoftReset>(this);
+        (_initialPosition, _initialRotation) = (_rigidbody.position, _rigidbody.rotation);
+        StartActions.AddListener(SoftResetHandler);
+        base.Awake();
     }
 
-    private void OnDestroy()
-    {
-        EventBus.Unsubscribe<ISoftReset>(this);
-    }
-
+#if UNITY_EDITOR
     private void OnValidate()
     {
         if (_rigidbody == null) { _rigidbody = GetComponent<Rigidbody2D>(); }
     }
+#endif
 }

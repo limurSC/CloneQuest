@@ -1,64 +1,84 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using static UnityEngine.InputSystem.InputAction;
 
-public class Bootstrap : MonoBehaviour
+public class Bootstrap : MonoBehaviour, ILevelSoftResetStartHandler, ILevelSoftResetEndHandler, ILevelReadyHandler, ILevelStartHandler
 {
-
-    [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private GameObject _clonePrefab;
 
-    private GameObject _player;
-    private RecordingPlayerInput _playerInput;
-    private IControllable _playerControls;
-    private Vector3 _spawnPoint;
-    private List<(InputReplay input, Transform transform)> _clones = new();
+    private CloneSystem _cloneSystem;
+    private PlayerActions _input;
     private bool _pause;
+
 
     private void Start()
     {
-        _player = FindObjectOfType<PlayerControls>().gameObject;
-        _spawnPoint = _player.transform.position;
-        _playerControls = _player.GetComponent<IControllable>();
+        var playerControls = FindObjectOfType<PlayerControls>();
 
-        _playerInput = new(_playerControls);
+        _cloneSystem = new CloneSystem(new(playerControls), _clonePrefab, playerControls.transform.position);
 
-        var input = new PlayerActions();
-        input.Game.Clone.started += (ctx) => Coroutines.Run(SpawnClone());
-        input.Game.Restart.started += (ctx) => { Restart(); EventBus.Invoke<ISoftReset>((obj) => obj.SoftReset(0.5f)); };
-        input.Game.Esc.started += (ctx) => TogglePause();
-        input.Game.Enable();
+        _input = new PlayerActions();
+        _input.Game.Clone.started += (ctx) => { _cloneSystem.AddCloneAndRestart(); };
+        _input.Game.Restart.started += (ctx) => { ReloadLevel(); };
+        _input.Game.Esc.started += (ctx) => { TogglePause(); };
+        _input.Game.Enable();
 
-        _playerInput.Enable = true;
-
+        EventBus.Invoke<ILevelReadyHandler>(obj => obj.OnLevelReady());
     }
 
-    IEnumerator SpawnClone()
-    {
-        var inputRecord = _playerInput.Reset();
-        var clone = Instantiate(_clonePrefab);
-        var cloneControls = clone.GetComponent<IControllable>();
-        var cloneInput = new InputReplay(cloneControls, inputRecord);
-        _clones.Add((cloneInput, clone.transform));
-        _player.transform.position = _spawnPoint;
-        _clones.ForEach((clone) => { clone.input.Stop(); clone.transform.position = _spawnPoint; });
-        yield return new WaitForSecondsRealtime(0.5f);
-        _clones.ForEach((clone) => clone.input.Start());
-        _playerInput.Enable = true;
-    }
-
-    void Restart()
-    {
-        _clones.ForEach((clone) => { Destroy(clone.transform.gameObject); });
-        _clones.Clear();
-        _player.transform.position = _spawnPoint;
-        _playerInput.Reset();
-        _playerInput.Enable = true;
-    }
-
-    void TogglePause()
+    private void TogglePause()
     {
         Time.timeScale = _pause ? 1f : 0f;
         _pause = !_pause;
+        // TODO Disable inputs
+    }
+
+    public void OnLevelReady()
+    {
+        _input.Game.Move.actionMap.actionTriggered += OnAnyButtonPressed;
+    }
+
+    private void OnAnyButtonPressed(CallbackContext ctx) => EventBus.Invoke<ILevelStartHandler>(obj => obj.OnLevelStart());
+
+    public void OnLevelStart()
+    {
+        _input.Game.Move.actionMap.actionTriggered -= OnAnyButtonPressed;
+        _cloneSystem.Start();
+    }
+
+    public void OnSoftResetStart(float duration)
+    {
+        StartCoroutine(WaitForSoftResetEnd());
+        IEnumerator WaitForSoftResetEnd()
+        {
+            yield return new WaitForSeconds(duration);
+            EventBus.Invoke<ILevelSoftResetEndHandler>(obj => obj.OnSoftResetEnd());
+            EventBus.Invoke<ILevelReadyHandler>(obj => obj.OnLevelReady());
+        }
+    }
+
+    public void OnSoftResetEnd() { }
+
+    private void ReloadLevel()
+    {
+        EventBus.Invoke<IBeforeLevelReloadHandler>(obj => obj.OnBeforeLevelReload());
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void Awake()
+    {
+        EventBus.Subscribe<ILevelReadyHandler>(this);
+        EventBus.Subscribe<ILevelStartHandler>(this);
+        EventBus.Subscribe<ILevelSoftResetStartHandler>(this);
+        EventBus.Subscribe<ILevelSoftResetEndHandler>(this);
+    }
+
+    private void OnDestroy()
+    {
+        EventBus.Unsubscribe<ILevelReadyHandler>(this);
+        EventBus.Unsubscribe<ILevelStartHandler>(this);
+        EventBus.Unsubscribe<ILevelSoftResetStartHandler>(this);
+        EventBus.Unsubscribe<ILevelSoftResetEndHandler>(this);
     }
 }

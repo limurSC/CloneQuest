@@ -10,6 +10,7 @@ public static class EventBus
         var type = typeof(TSubscriber);
         if (!_subscribers.TryGetValue(type, out var typeSubscribers))
         {
+            if (!type.IsInterface) { throw new ArgumentException($"{type.Name} is not interface."); }
             typeSubscribers = new SubscribersSet<object>();
             _subscribers.Add(type, typeSubscribers);
         }
