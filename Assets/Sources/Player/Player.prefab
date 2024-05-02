@@ -374,10 +374,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63e1dd2db052594448ac33ea0d6b20e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 128
   _rigidbody: {fileID: 672753259788737339}
+  _contactFilter:
+    useTriggers: 0
+    useLayerMask: 1
+    useDepth: 0
+    useOutsideDepth: 0
+    useNormalAngle: 0
+    useOutsideNormalAngle: 0
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 129
+    minDepth: 0
+    maxDepth: 0
+    minNormalAngle: 0
+    maxNormalAngle: 0
   _direction: {x: 0, y: -1}
   _distance: 0.05
 --- !u!114 &266205145893600881
