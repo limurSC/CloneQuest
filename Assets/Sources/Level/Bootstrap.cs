@@ -1,55 +1,40 @@
+using System;
 using System.Collections;
-using Newtonsoft.Json.Bson;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static UnityEngine.InputSystem.InputAction;
 
-public class Bootstrap : MonoBehaviour, ILevelSoftResetStartHandler, ILevelSoftResetEndHandler, ILevelReadyHandler, ILevelStartHandler, IPauseToggled, IRestart
+public class Bootstrap : MonoBehaviour, ILevelLoadHandler, ILevelSoftResetStartHandler, ILevelReadyHandler, ILevelStartHandler, IPauseToggleHandler, ILevelReloadHandler
 {
     [SerializeField] private GameObject _clonePrefab;
 
+    private LevelContext _levelContext;
     private CloneSystem _cloneSystem;
     private PlayerActions _input;
     private bool _pause;
 
+    public void OnLevelLoad(LevelContext levelContext)
+    {
+        EventBus.Unsubscribe<ILevelLoadHandler>(this);
+        _levelContext = levelContext;
+    }
 
-    private void Start()
+    private void PrepareLevel()
     {
         var playerControls = FindObjectOfType<PlayerControls>();
-
         _cloneSystem = new CloneSystem(new(playerControls), _clonePrefab, playerControls.transform.position);
-
         _input = new PlayerActions();
         _input.Game.Clone.started += (ctx) => { _cloneSystem.AddCloneAndRestart(); };
-        _input.Game.Restart.started += (ctx) => { ReloadLevel(); };
+        _input.Game.Restart.started += (ctx) => { OnLevelRestart(); };
         _input.Game.Esc.started += (ctx) => { TogglePause(); };
         _input.Game.Enable();
-
         EventBus.Invoke<ILevelReadyHandler>(obj => obj.OnLevelReady());
-    }
-
-    public void OnPauseToggled()
-    {
-        TogglePause();
-    }
-
-    public void OnRestarted()
-    {
-        ReloadLevel();
-    }
-
-    private void TogglePause()
-    {
-        Time.timeScale = _pause ? 1f : 0f;
-        _pause = !_pause;
-        // TODO Disable inputs
     }
 
     public void OnLevelReady()
     {
         _input.Game.Move.actionMap.actionTriggered += OnAnyButtonPressed;
-        if(_pause)
-            TogglePause();
+        if (_pause) { TogglePause(); }
     }
 
     private void OnAnyButtonPressed(CallbackContext ctx) => EventBus.Invoke<ILevelStartHandler>(obj => obj.OnLevelStart());
@@ -58,8 +43,18 @@ public class Bootstrap : MonoBehaviour, ILevelSoftResetStartHandler, ILevelSoftR
     {
         _input.Game.Move.actionMap.actionTriggered -= OnAnyButtonPressed;
         _cloneSystem.Start();
-        if(_pause)
-            TogglePause();
+        if (_pause) { TogglePause(); }
+    }
+
+    public void OnLevelRestart() => LevelManager.Load(_levelContext);
+
+    public void OnPauseToggled() => TogglePause();
+
+    private void TogglePause()
+    {
+        Time.timeScale = _pause ? 1f : 0f;
+        _pause = !_pause;
+        // TODO Disable inputs
     }
 
     public void OnSoftResetStart(float duration)
@@ -73,32 +68,43 @@ public class Bootstrap : MonoBehaviour, ILevelSoftResetStartHandler, ILevelSoftR
         }
     }
 
-    public void OnSoftResetEnd() { }
-
-    private void ReloadLevel()
-    {
-        EventBus.Invoke<IBeforeLevelReloadHandler>(obj => obj.OnBeforeLevelReload());
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        OnLevelReady();
-    }
-
-    private void Awake()
+    private void Subscribe()
     {
         EventBus.Subscribe<ILevelReadyHandler>(this);
         EventBus.Subscribe<ILevelStartHandler>(this);
         EventBus.Subscribe<ILevelSoftResetStartHandler>(this);
-        EventBus.Subscribe<ILevelSoftResetEndHandler>(this);
-        EventBus.Subscribe<IPauseToggled>(this);
-        EventBus.Subscribe<IRestart>(this);
+        EventBus.Subscribe<IPauseToggleHandler>(this);
+        EventBus.Subscribe<ILevelReloadHandler>(this);
     }
 
-    private void OnDestroy()
+    private void Unsubscribe()
     {
+        _input.Dispose();
         EventBus.Unsubscribe<ILevelReadyHandler>(this);
         EventBus.Unsubscribe<ILevelStartHandler>(this);
         EventBus.Unsubscribe<ILevelSoftResetStartHandler>(this);
-        EventBus.Unsubscribe<ILevelSoftResetEndHandler>(this);
-        EventBus.Unsubscribe<IPauseToggled>(this);
-        EventBus.Unsubscribe<IRestart>(this);
+        EventBus.Unsubscribe<IPauseToggleHandler>(this);
+        EventBus.Unsubscribe<ILevelReloadHandler>(this);
+    }
+
+    private void Awake() => EventBus.Subscribe<ILevelLoadHandler>(this);
+
+
+    private void Start()
+    {
+#if UNITY_EDITOR
+        if (_levelContext == null)
+        {
+            _levelContext = new(0, Array.AsReadOnly(new string[] { SceneManager.GetActiveScene().name }), "");
+            Debug.LogWarning($"LevelContext is null set {_levelContext.Id}");
+        }
+#endif
+        Subscribe();
+        PrepareLevel();
+    }
+    private void OnDestroy()
+    {
+        EventBus.Invoke<IBeforeLevelUnloadHandler>(obj => obj.OnBeforeLevelUnload());
+        Unsubscribe();
     }
 }

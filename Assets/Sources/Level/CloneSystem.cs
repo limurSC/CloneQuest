@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class CloneSystem : ILevelSoftResetEndHandler, IBeforeLevelReloadHandler
+public class CloneSystem : ILevelSoftResetEndHandler, IBeforeLevelUnloadHandler
 {
     public enum ReadyState { Ready, Running, NotReady }
     public ReadyState State { get; private set; }
@@ -59,17 +59,17 @@ public class CloneSystem : ILevelSoftResetEndHandler, IBeforeLevelReloadHandler
         State = ReadyState.Ready;
     }
 
-    public void OnBeforeLevelReload() => Unsubscribe();
+    public void OnBeforeLevelUnload() => Unsubscribe();
 
     private void Subscribe()
     {
         EventBus.Subscribe<ILevelSoftResetEndHandler>(this);
-        EventBus.Subscribe<IBeforeLevelReloadHandler>(this);
+        EventBus.Subscribe<IBeforeLevelUnloadHandler>(this);
     }
 
     private void Unsubscribe()
     {
         EventBus.Unsubscribe<ILevelSoftResetEndHandler>(this);
-        EventBus.Unsubscribe<IBeforeLevelReloadHandler>(this);
+        EventBus.Unsubscribe<IBeforeLevelUnloadHandler>(this);
     }
 }
