@@ -6,6 +6,6 @@ public class Restart : MonoBehaviour
 {
     public void DoRestart()
     {
-        EventBus.Invoke<IRestart>(act => act.OnRestarted());
+        EventBus.Invoke<ILevelReloadHandler>(act => act.OnLevelRestart());
     }
 }

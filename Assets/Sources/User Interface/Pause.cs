@@ -6,6 +6,6 @@ public class Pause : MonoBehaviour
 {
     public void TogglePause()
     {
-        EventBus.Invoke<IPauseToggled>(act => act.OnPauseToggled());
+        EventBus.Invoke<IPauseToggleHandler>(act => act.OnPauseToggled());
     }
 }

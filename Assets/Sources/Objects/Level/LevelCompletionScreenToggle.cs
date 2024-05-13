@@ -16,7 +16,7 @@ public class LevelCompletionScreenToggle : MonoBehaviour
     void ToggleCompletionScreen()
     {
         _gameCanvasEvents.OnLevelCompletion();
-        EventBus.Invoke<IPauseToggled>(act => act.OnPauseToggled());
+        EventBus.Invoke<IPauseToggleHandler>(act => act.OnPauseToggled());
     }
 
     #if UNITY_EDITOR
