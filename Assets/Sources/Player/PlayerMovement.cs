@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerControls))]
@@ -8,17 +9,16 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private PlayerControls _controls;
     [SerializeField] private PlayerConfig _config;
-    [SerializeField] private Transform _flipAnchor;
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private Sensor _groundSensor;
 
+    [SerializeField] private UnityEvent<bool> _groundState;
+    [SerializeField] private UnityEvent<float> _moveVelocity;
+    [SerializeField] private UnityEvent<int> _moveDirection;
+    [SerializeField] private UnityEvent<float> _airVelocity;
+
     private Vector2 _frameVelocity;
     private Vector2 _platformVelocity;
-
-    void Awake()
-    {
-        SetRotation(_facingRight);
-    }
 
     void FixedUpdate()
     {
@@ -26,7 +26,6 @@ public class PlayerMovement : MonoBehaviour
         HandleVelocity();
         HandleMove();
         HandleJump();
-        UpdateRotation();
         HandleGravity();
         ApplyVelocity();
     }
@@ -50,13 +49,16 @@ public class PlayerMovement : MonoBehaviour
             {
                 _wasGrounded = true;
                 _coyoteLocked = false;
+                _groundState.Invoke(_wasGrounded);
             }
         }
         else
         {
+            _airVelocity.Invoke(_frameVelocity.y);
             if (_wasGrounded)
             {
                 _wasGrounded = false;
+                _groundState.Invoke(_wasGrounded);
             }
         }
     }
@@ -80,13 +82,14 @@ public class PlayerMovement : MonoBehaviour
     {
         var move = _controls.Move;
         var direction = MathF.Sign(move);
-        _facingRight = GetRotationByDirection(direction);
+        _moveDirection.Invoke(direction);
         if (_isGrounded)
         {
             if (_groundAngle > _config.MaxSurfaceAngle) { return; }
             var groundNormal = _groundSensor.Hit.normal;
             var alongGround = new Vector2(groundNormal.y, -groundNormal.x);
             var relativeVelocity = _frameVelocity - _platformVelocity;
+            _moveVelocity.Invoke(relativeVelocity.x);
             _frameVelocity = ((direction == 0)
                 ? Vector2.MoveTowards(relativeVelocity, Vector2.zero, _config.Deceleration * Time.fixedDeltaTime)
                 : Vector2.MoveTowards(relativeVelocity, _config.Velocity * move * alongGround,
@@ -145,31 +148,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
     #endregion
-
-    #region Rotation
-    // TODO Should move to visual component
-    [SerializeField] private bool _facingRight;
-    private bool _previousFacingRight;
-    private bool GetRotationByDirection(float direction) => direction == 0 ? _facingRight : direction > 0;
-
-    private void SetRotation(bool facingRight)
-    {
-        _facingRight = facingRight;
-        var localScale = _flipAnchor.localScale;
-        localScale.x = facingRight ? 1f : -1f;
-        _flipAnchor.localScale = localScale;
-    }
-
-    private bool UpdateRotation()
-    {
-        if (_previousFacingRight == _facingRight)
-            return false;
-        _previousFacingRight = _facingRight;
-        SetRotation(_facingRight);
-        return true;
-    }
-
-    #endregion Rotation
 
     private void ApplyVelocity() => _rigidbody.velocity = _frameVelocity;
 

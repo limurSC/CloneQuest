@@ -5,19 +5,20 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Collider2D))]
 public class Plate : MonoBehaviour
 {
-    [SerializeField] private UnityEvent<bool> OnActivateSet;
+    [SerializeField] private UnityEvent OnActivate;
+    [SerializeField] private UnityEvent OnDeactivateSet;
     private int _triggers = 0;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (_triggers == 0) { OnActivateSet.Invoke(true); }
+        if (_triggers == 0) { OnActivate.Invoke(); }
         _triggers += 1;
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
         _triggers -= 1;
-        if (_triggers == 0) { OnActivateSet.Invoke(false); }
+        if (_triggers == 0) { OnDeactivateSet.Invoke(); }
     }
 
 #if UNITY_EDITOR
