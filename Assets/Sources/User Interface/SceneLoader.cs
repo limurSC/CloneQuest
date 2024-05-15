@@ -5,13 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
-    public void LoadScene(string sceneName)
+    public static void LoadScene(string sceneName)
     {
+        EventBus.Invoke<IBeforeLevelUnloadHandler>((obj) => obj.OnBeforeLevelUnload());
         SceneManager.LoadScene(sceneName);
     }
-
-    public void LoadSceneFromScene(Scene scene)
+    
+    public static void TryLoadingNextLevel()
     {
-        SceneManager.LoadScene(scene.buildIndex);
+        LevelManager.LoadNextLevel();
     }
 }

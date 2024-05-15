@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static UnityEngine.InputSystem.InputAction;
 
-public class Bootstrap : MonoBehaviour, ILevelLoadHandler, ILevelSoftResetStartHandler, ILevelReadyHandler, ILevelStartHandler, IPauseToggleHandler, ILevelReloadHandler
+public class Bootstrap : MonoBehaviour, ILevelLoadHandler, ILevelSoftResetStartHandler, ILevelReadyHandler, ILevelStartHandler, IPauseToggleHandler, ILevelReloadHandler,
+    IBeforeLevelUnloadHandler
 {
     [SerializeField] private GameObject _clonePrefab;
 
@@ -46,7 +47,11 @@ public class Bootstrap : MonoBehaviour, ILevelLoadHandler, ILevelSoftResetStartH
         if (_pause) { TogglePause(); }
     }
 
-    public void OnLevelRestart() => LevelManager.Load(_levelContext);
+    public void OnLevelRestart()
+    {
+        LevelManager.Load(_levelContext);
+        if (_pause) { TogglePause(); }
+    }
 
     public void OnPauseToggled() => TogglePause();
 
@@ -75,6 +80,7 @@ public class Bootstrap : MonoBehaviour, ILevelLoadHandler, ILevelSoftResetStartH
         EventBus.Subscribe<ILevelSoftResetStartHandler>(this);
         EventBus.Subscribe<IPauseToggleHandler>(this);
         EventBus.Subscribe<ILevelReloadHandler>(this);
+        EventBus.Subscribe<IBeforeLevelUnloadHandler>(this);
     }
 
     private void Unsubscribe()
@@ -85,6 +91,7 @@ public class Bootstrap : MonoBehaviour, ILevelLoadHandler, ILevelSoftResetStartH
         EventBus.Unsubscribe<ILevelSoftResetStartHandler>(this);
         EventBus.Unsubscribe<IPauseToggleHandler>(this);
         EventBus.Unsubscribe<ILevelReloadHandler>(this);
+        EventBus.Unsubscribe<IBeforeLevelUnloadHandler>(this);
     }
 
     private void Awake() => EventBus.Subscribe<ILevelLoadHandler>(this);
@@ -106,5 +113,10 @@ public class Bootstrap : MonoBehaviour, ILevelLoadHandler, ILevelSoftResetStartH
     {
         EventBus.Invoke<IBeforeLevelUnloadHandler>(obj => obj.OnBeforeLevelUnload());
         Unsubscribe();
+    }
+
+    public void OnBeforeLevelUnload()
+    {
+        if (_pause) { TogglePause(); }
     }
 }

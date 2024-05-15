@@ -5,13 +5,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 public class TESTLevelMenu : MonoBehaviour
 {
     [SerializeField] RectTransform _container;
     [SerializeField] Button _buttonTemplate;
     [HideInInspector][SerializeField] string[] _levelIds;
-
+    
     private Button[] _buttons;
 
     private void CreateButtons()
@@ -41,6 +42,7 @@ public class TESTLevelMenu : MonoBehaviour
         _levelIds = _levelAssets
             .Select(scene => scene.name)
             .ToArray();
+        LevelManager.levelsByName = _levelAssets.Select(scene => scene.name).ToList();
     }
 #endif
 }
